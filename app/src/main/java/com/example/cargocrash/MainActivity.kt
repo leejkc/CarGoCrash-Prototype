@@ -4,13 +4,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.cargocrash.ui.theme.CarGoCrashTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,10 +25,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CarGoCrashTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    AppNavigation(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
@@ -31,17 +33,118 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun AppNavigation(modifier: Modifier = Modifier) {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") {
+            HomeScreen(
+                onHi1Click = { navController.navigate("hello1") },
+                onHi2Click = { navController.navigate("hello2") }
+            )
+        }
+        composable("hello1") { Hello1Screen(onBackClick = { navController.popBackStack() }) }
+        composable("hello2") { Hello2Screen(onBackClick = { navController.popBackStack() }) }
+    }
+}
+
+// home screen
+@Composable
+fun HomeScreen(
+    onHi1Click: () -> Unit,
+    onHi2Click: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        Text(
+            text = "CarGoCrash",
+            fontSize = 36.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(vertical = 24.dp)
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = onHi1Click,
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text("Hi 1")
+        }
+
+        Button(
+            onClick = onHi2Click,
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text("Hi 2")
+        }
+    }
+}
+
+// sub-screens
+@Composable
+fun Hello1Screen(onBackClick: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Hello 1",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = onBackClick) {
+            Text("Back")
+        }
+    }
+}
+
+@Composable
+fun Hello2Screen(onBackClick: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Hello 2",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = onBackClick) {
+            Text("Back")
+        }
+    }
+}
+
+// screen previews
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    CarGoCrashTheme {
+        HomeScreen({}, {})
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun Hello1ScreenPreview() {
     CarGoCrashTheme {
-        Greeting("Android")
+        Hello1Screen({})
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun Hello2ScreenPreview() {
+    CarGoCrashTheme {
+        Hello2Screen({})
     }
 }
