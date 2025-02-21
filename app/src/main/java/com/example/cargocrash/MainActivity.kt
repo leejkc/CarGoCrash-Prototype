@@ -1,9 +1,11 @@
 package com.example.cargocrash
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -16,13 +18,20 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.remember
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.cargocrash.ui.theme.CarGoCrashTheme
 
 class MainActivity : ComponentActivity() {
+    @OptIn(UnstableApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -36,6 +45,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@UnstableApi
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
@@ -43,20 +53,20 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
             HomeScreen(
-                onHi1Click = { navController.navigate("hello1") },
-                onHi2Click = { navController.navigate("hello2") }
+                on1Click = { navController.navigate("hello1") },
+                on2Click = { navController.navigate("video2") }
             )
         }
         composable("hello1") { Hello1Screen(onBackClick = { navController.popBackStack() }) }
-        composable("hello2") { Hello2Screen(onBackClick = { navController.popBackStack() }) }
+        composable("video2") { Video2Screen(onBackClick = { navController.popBackStack() }) }
     }
 }
 
 // home screen
 @Composable
 fun HomeScreen(
-    onHi1Click: () -> Unit,
-    onHi2Click: () -> Unit,
+    on1Click: () -> Unit,
+    on2Click: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -74,32 +84,38 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            Text(
-                text = "Car Go Crash",
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 70.dp)
+            Image(
+                painter = painterResource(id = R.drawable.crashkit),
+                contentDescription = "Title",
+                modifier = Modifier
+                    .padding(vertical = 70.dp)
+                    .height(80.dp)
+                    .clip(shape = RoundedCornerShape(16.dp)),
+                contentScale = ContentScale.Crop
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
-                onClick = onHi1Click,
-                modifier = Modifier.padding(8.dp)
+                onClick = on1Click,
+                modifier = Modifier.padding(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF5B0C1C),
+                    contentColor = Color.White
+                )
             ) {
-                Text("Hi 1")
+                Text("Text Example")
             }
 
             Button(
-                onClick = onHi2Click,
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.background),
-                    contentDescription = "Background",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                onClick = on2Click,
+                modifier = Modifier.padding(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF5B0C1C),
+                    contentColor = Color.White
                 )
+            ) {
+                Text("Video Example")
             }
         }
     }
@@ -123,20 +139,27 @@ fun Hello1Screen(onBackClick: () -> Unit) {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Hello 1",
+                text = "SAMPLE TEXT",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = onBackClick) {
+            Button(
+                onClick = onBackClick,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF5B0C1C),
+                    contentColor = Color.White
+                )
+            ) {
                 Text("Back")
             }
         }
     }
 }
 
+@UnstableApi
 @Composable
-fun Hello2Screen(onBackClick: () -> Unit) {
+fun Video2Screen(onBackClick: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize()) {
         // Background Image
         Image(
@@ -151,18 +174,45 @@ fun Hello2Screen(onBackClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "Hello 2",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
+            Image(
+                painter = painterResource(id = R.drawable.crashkit),
+                contentDescription = "Title",
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .height(70.dp)
+                    .clip(shape = RoundedCornerShape(16.dp)),
+                contentScale = ContentScale.Crop
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = onBackClick) {
+
+            LocalVideoScreen("getting_rear_ended")
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = onBackClick,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF5B0C1C),
+                    contentColor = Color.White
+                )
+            ) {
                 Text("Back")
             }
         }
     }
 }
+@UnstableApi
+@Composable
+fun LocalVideoScreen(dir: String) {
+    val context = LocalContext.current
+    val videoUri = remember {
+        Uri.parse("android.resource://${context.packageName}/raw/$dir")
+    }
+
+    VideoPlayer(
+        videoUri = videoUri.toString(),
+        modifier = Modifier.clip(shape = RoundedCornerShape(16.dp))
+    )
+}
+
 
 // screen previews
 @Preview(showBackground = true)
@@ -181,10 +231,20 @@ fun Hello1ScreenPreview() {
     }
 }
 
+@OptIn(UnstableApi::class)
 @Preview(showBackground = true)
 @Composable
-fun Hello2ScreenPreview() {
+fun Video2ScreenPreview() {
     CarGoCrashTheme {
-        Hello2Screen({})
+        Video2Screen({})
+    }
+}
+
+@Preview(showBackground = true)
+@UnstableApi
+@Composable
+fun VideoScreenPreview() {
+    CarGoCrashTheme {
+        LocalVideoScreen("getting_rear_ended") // example video
     }
 }
