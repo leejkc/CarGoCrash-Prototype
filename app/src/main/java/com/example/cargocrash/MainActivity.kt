@@ -443,12 +443,12 @@ fun CollisionsPage(
         Column(
             // use lazyColumn if there are more elements that don't fit on screen
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .padding(vertical = 64.dp)
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Spacer(modifier = Modifier.height(64.dp))
             Image(
                 painter = painterResource(id = R.drawable.crashkit),
                 contentDescription = "Title",
